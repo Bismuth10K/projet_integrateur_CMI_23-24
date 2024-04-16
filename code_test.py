@@ -2,8 +2,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 import ot
 import cv2
-import os
-from tensorflow.python.ops.numpy_ops import np_config
 import matplotlib.pylab as pl
 import sklearn.cluster as skcluster
 
@@ -13,8 +11,8 @@ rng = np.random.RandomState(1)
 def im2mat(img):
 	"""
     Convertie une image en matrice (un pixel par ligne)
-    Entrée: - img(matrix): Image que l'on cherche à transformer en matrice
-    Sortie: Matrice obtenue après le reshape
+    Entrée : - img(matrix): Image que l'on cherche à transformer en matrice
+    Sortie : Matrice obtenue après le reshape
     """
 	return img.reshape((img.shape[0] * img.shape[1], img.shape[2]))
 
