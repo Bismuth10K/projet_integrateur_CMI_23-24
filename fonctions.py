@@ -1,8 +1,6 @@
 import cv2
-import matplotlib.pylab as pl
 import numpy as np
 import ot
-import sklearn.cluster as skcluster
 from matplotlib import pyplot as plt
 from sklearn.cluster import MiniBatchKMeans
 
@@ -105,9 +103,8 @@ def plot_distribution(ax, X, title):
 	"""
 	ax.scatter(X[:, 0], X[:, 2], c=X)
 	ax.axis([0, 1, 0, 1])
-	ax.xlabel('Red')
-	ax.ylabel('Blue')
-	ax.title(title)
+	ax.set(xlabel='Red', ylabel='Blue')
+	ax.set_title(title)
 	return ax
 
 

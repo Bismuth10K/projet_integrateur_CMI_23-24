@@ -1,7 +1,7 @@
 import time
 
-import matplotlib.pyplot as plt
-
+import matplotlib.image
+from PIL import Image
 from fonctions import *
 
 rng = np.random.RandomState(1)
@@ -11,52 +11,60 @@ class POTO:
 	def __init__(self, img_ref, img_tar=None):
 		start = time.time()
 
+		self.model_clust = MiniBatchKMeans(n_clusters=1000, init_size=3000, random_state=2)
 		self.ot_model = None
 		self.img_ref = img_ref
 		self.mat_ref = im2mat(img_ref)
-		self.mat_clstr_ref = clustering(self.mat_ref)
+		self.mat_clstr_ref = clustering(self.mat_ref, self.model_clust)
 		end_clust_1 = time.time()
+		print("Temps de clustering 1 :", end_clust_1 - start)
 
 		if img_tar is not None:
 			self.img_tar = img_tar
 			self.mat_tar = im2mat(img_tar)
-			self.mat_clstr_tar = clustering(self.mat_tar)
+			self.mat_clstr_tar = clustering(self.mat_tar, self.model_clust)
 		else:
 			self.img_tar = None
 			self.mat_tar = None
 			self.mat_clstr_tar = None
 		end_clust_2 = time.time()
-
-		print("Temps de clustering 1: ", end_clust_1 - start)
-		print("Temps de clustering 2: ", end_clust_2 - end_clust_1)
+		print("Temps de clustering 2 :", end_clust_2 - end_clust_1)
 
 	def set_target(self, img_tar):
 		self.img_tar = img_tar
 		self.mat_tar = im2mat(img_tar)
-		self.mat_clstr_tar = clustering(self.mat_tar)
+		self.mat_clstr_tar = clustering(self.mat_tar, self.model_clust)
+
+	def set_target_all(self, img, mat, mat_clstr):
+		self.img_tar = img
+		self.mat_tar = mat
+		self.mat_clstr_tar = mat_clstr
+
+	def get_ref_all(self):
+		return self.img_ref, self.mat_ref, self.mat_clstr_ref
 
 	def plot_distribution(self):
 		if self.mat_clstr_tar is not None:
-			figs, axs = plt.subplots(2, 1)
-			axs[0] = plot_distribution(axs[0], self.mat_clstr_ref, "Distribution de couleur de l'image de référence")
+			fig, axs = plt.subplots(2)
+			fig.tight_layout(pad=2.0)
 			axs[1] = plot_distribution(axs[1], self.mat_clstr_tar, "Distribution de couleur de l'image cible")
-			plt.show()
 		else:
-			figs, axs = plt.subplots(1, 1)
-			axs[0] = plot_distribution(axs[0], self.mat_clstr_ref, "Distribution de couleur de l'image de référence")
-			plt.show()
+			figs, axs = plt.subplots(1)
+		axs[0] = plot_distribution(axs[0], self.mat_clstr_ref, "Distribution de couleur de l'image de référence")
+		plt.show()
 
 	def plot_photos(self):
 		if self.img_tar is not None:
-			figs, axs = plt.subplots(2, 1)
+			fig, axs = plt.subplots(2, 1)
+			fig.tight_layout(pad=2.0)
 			axs[1].imshow(self.img_tar)
 			axs[1].set_axis_off()
-			axs[1].set_title("Distribution de couleur de l'image cible")
+			axs[1].set_title("Image cible")
 		else:
 			figs, axs = plt.subplots(1, 1)
 		axs[0].imshow(self.img_ref)
 		axs[0].set_axis_off()
-		axs[0].set_title("Distribution de couleur de l'image de référence")
+		axs[0].set_title("Image de référence")
 		plt.show()
 
 	def train_ot(self, method="emd"):
@@ -82,18 +90,19 @@ class POTO:
 			ot_model.fit(Xs=self.mat_clstr_tar, Xt=self.mat_clstr_ref)
 			self.ot_model = ot_model
 
-			end = time.time()
-			print("Temps de color: ", end - start)
-
-			return ot_model
+			print("Temps d'entraînement :", time.time() - start)
 		except Exception as e:
 			raise Exception("Pas de cible.")
 
 	def apply_ot(self):
-		new_img = self.ot_model.transform(Xs=self.img_tar)
-		img = minmax(mat2im(new_img, self.img_tar.shape))
-		plt.imshow(img)
-		return img
+		start = time.time()
+		new_img = self.ot_model.transform(Xs=self.mat_clstr_tar)
+		img = minmax(mat2im(new_img, self.mat_clstr_tar.shape))
+		img_col = mat2im(img[self.model_clust.predict(self.mat_tar), :], self.img_tar.shape)
+		plt.imshow(img_col)
+		plt.show()
+		print("Temps de colorisation :", time.time() - start)
+		return img_col
 
 
 if __name__ == '__main__':
@@ -103,8 +112,8 @@ if __name__ == '__main__':
 	path_tar = './control_game_red_room.jpg'
 	img_tar, mat_tar = import_image(path_tar)
 
-	poto1 = POTO(img_ref, img_tar)
+	poto1 = POTO(img_tar, img_ref)
 	poto1.plot_photos()
-	# poto1.plot_distribution()
+	poto1.plot_distribution()
 	poto1.train_ot()
-	poto1.apply_ot()
+	matplotlib.image.imsave('name.png', poto1.apply_ot())
