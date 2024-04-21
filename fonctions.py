@@ -1,9 +1,8 @@
-import numpy as np
-from matplotlib import pyplot as plt
-import ot
 import cv2
-import matplotlib.pylab as pl
-import sklearn.cluster as skcluster
+import numpy as np
+import ot
+from matplotlib import pyplot as plt
+from sklearn.cluster import MiniBatchKMeans
 
 rng = np.random.RandomState(1)
 
@@ -48,21 +47,16 @@ def import_image(path):
 	return img, mat
 
 
-def print_image(img, title):
+def print_image(ax, img, title):
 	"""
 	Affiche l'image dans l'API utilisée
 	Entrées: - img(matrix): Image à afficher
 			 - title(str): Titre de l'image
 	"""
-	plt.imshow(img)
-	plt.axis('off')
-	plt.title(title)
-
-
-path_ref = './picture_city.jpg'
-img_ref, mat_ref = import_image(path_ref)
-
-print_image(img_ref, "Image référence")
+	ax.imshow(img)
+	ax.axis('off')
+	ax.title.set_text(title)
+	return ax
 
 
 def extract_frames(path):
@@ -86,22 +80,7 @@ def extract_frames(path):
 	return frames
 
 
-video_path = './video_city.mp4'
-frames = extract_frames(video_path)
-
-if frames is not None:
-	print(f"Number of frames extracted: {len(frames)}")
-else:
-	print("Error extracting frames.")
-
-print_image(frames[0], 'Image 0')
-
-print_image(frames[100], 'Image 100')
-
-print_image(frames[200], 'Image 200')
-
-
-def clustering(X, model_clust):
+def clustering(X, model_clust=MiniBatchKMeans(n_clusters=1000, init_size = 3000, random_state=2)):
 	"""
     Applique un clustering sur deux matrices d'images (Les valeurs de X doivent être entre 0 et 1).
     Entrées: - X1(matrice): Matrice de la première image
@@ -114,29 +93,19 @@ def clustering(X, model_clust):
 	return Xs
 
 
-nb_samples = 1000
-X_to_color = im2mat(frames[0]);
-X_color = im2mat(img_ref)
-model = skcluster.MiniBatchKMeans(n_clusters=nb_samples, init_size=3000)
-Xs = clustering(X_to_color, model)
-Xt = clustering(X_color, model)
-
-
-def plot_distribution(X, title):
+def plot_distribution(ax, X, title):
 	"""
 	Affiche la distribution des couleurs de la matrice en paramètre
-	Entrées: - X(matrice): Matrice de l'image étudiée
-			 - title(str): Titre du graphe
+	Entrées:
+				- ax (subplots) : Objet plot de matplotlib
+				- X(matrice): Matrice de l'image étudiée
+				- title(str): Titre du graphe
 	"""
-	plt.scatter(X[:, 0], X[:, 2], c=X)
-	plt.axis([0, 1, 0, 1])
-	plt.xlabel('Red')
-	plt.ylabel('Blue')
-	plt.title(title)
-	plt.show()
-
-
-plot_distribution(Xt, "distribution de couleur de l'image de référence")
+	ax.scatter(X[:, 0], X[:, 2], c=X)
+	ax.axis([0, 1, 0, 1])
+	ax.set(xlabel='Red', ylabel='Blue')
+	ax.set_title(title)
+	return ax
 
 
 def tran_opt(Xs, Xt, X, img_shape, method="emd"):
@@ -166,22 +135,3 @@ def tran_opt(Xs, Xt, X, img_shape, method="emd"):
 	transp_Xs = ot_model.transform(Xs=X)
 	img = minmax(mat2im(transp_Xs, img_shape))
 	return img
-
-
-img = tran_opt(Xs, Xt, X_to_color, frames[0].shape)
-
-
-def showImage(img, title):
-	"""
-	Affiche une image avec un titre associé
-	Entrées: - img(image): Image à afficher
-			 - title(str): Titre de l'image
-	"""
-	pl.figure(figsize=(8, 8))
-	pl.imshow(img)
-	pl.axis('off')
-	pl.title(title)
-	pl.show()
-
-
-showImage(img, 'Image 0 recolorisée')
