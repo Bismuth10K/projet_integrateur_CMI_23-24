@@ -13,7 +13,7 @@ def automate_series(path_series: str, name_render: str):
 	list_info_imgs = []
 	list_name = os.listdir((path_series))
 	for file in list_name:
-		if file.endswith(".png") or file.endswith(".jpg") or file.endswith(".jpeg"):
+		if file.endswith(".jpg") or file.endswith(".jpeg"):
 			print(f"---Clustering de '{file.title()[:-4]}' (cluster {len(list_obj_poto) + 1})---")
 			img, mat = import_image(os.path.join(path_series, file))
 			cur_poto = POTO(img)
