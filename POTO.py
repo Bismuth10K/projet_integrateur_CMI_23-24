@@ -17,18 +17,18 @@ class POTO:
 		self.mat_ref = im2mat(img_ref)
 		self.mat_clstr_ref = clustering(self.mat_ref, self.model_clust)
 		end_clust_1 = time.time()
-		print("Temps de clustering 1 :", end_clust_1 - start)
+		print(f"Temps de clustering image référence : {round(end_clust_1 - start, 2)}s")
 
 		if img_tar is not None:
 			self.img_tar = img_tar
 			self.mat_tar = im2mat(img_tar)
 			self.mat_clstr_tar = clustering(self.mat_tar, self.model_clust)
+			end_clust_2 = time.time()
+			print(f"Temps de clustering image cible : {round(end_clust_2 - end_clust_1, 2)}s")
 		else:
 			self.img_tar = None
 			self.mat_tar = None
 			self.mat_clstr_tar = None
-		end_clust_2 = time.time()
-		print("Temps de clustering 2 :", end_clust_2 - end_clust_1)
 
 	def set_target(self, img_tar):
 		self.img_tar = img_tar
@@ -41,7 +41,7 @@ class POTO:
 		self.mat_clstr_tar = mat_clstr
 
 	def get_ref_all(self):
-		return self.img_ref, self.mat_ref, self.mat_clstr_ref
+		return [self.img_ref, self.mat_ref, self.mat_clstr_ref]
 
 	def plot_distribution(self):
 		if self.mat_clstr_tar is not None:
@@ -55,13 +55,13 @@ class POTO:
 
 	def plot_photos(self):
 		if self.img_tar is not None:
-			fig, axs = plt.subplots(2, 1)
+			fig, axs = plt.subplots(2)
 			fig.tight_layout(pad=2.0)
 			axs[1].imshow(self.img_tar)
 			axs[1].set_axis_off()
 			axs[1].set_title("Image cible")
 		else:
-			figs, axs = plt.subplots(1, 1)
+			figs, axs = plt.subplots(1)
 		axs[0].imshow(self.img_ref)
 		axs[0].set_axis_off()
 		axs[0].set_title("Image de référence")
@@ -90,7 +90,7 @@ class POTO:
 			ot_model.fit(Xs=self.mat_clstr_tar, Xt=self.mat_clstr_ref)
 			self.ot_model = ot_model
 
-			print("Temps d'entraînement :", time.time() - start)
+			print(f"Temps d'entraînement : {round(time.time() - start, 2)}s")
 		except Exception as e:
 			raise Exception("Pas de cible.")
 
@@ -99,21 +99,21 @@ class POTO:
 		new_img = self.ot_model.transform(Xs=self.mat_clstr_tar)
 		img = minmax(mat2im(new_img, self.mat_clstr_tar.shape))
 		img_col = mat2im(img[self.model_clust.predict(self.mat_tar), :], self.img_tar.shape)
-		plt.imshow(img_col)
-		plt.show()
-		print("Temps de colorisation :", time.time() - start)
+		# plt.imshow(img_col)
+		# plt.show()
+		print(f"Temps de colorisation : {round(time.time() - start, 2)}s")
 		return img_col
 
 
 if __name__ == '__main__':
-	path_ref = './picture_city.jpg'
+	path_ref = './source.jpg'
 	img_ref, mat_ref = import_image(path_ref)
 
-	path_tar = './control_game_red_room.jpg'
+	path_tar = './cible.jpg'
 	img_tar, mat_tar = import_image(path_tar)
 
 	poto1 = POTO(img_tar, img_ref)
 	poto1.plot_photos()
 	poto1.plot_distribution()
 	poto1.train_ot()
-	matplotlib.image.imsave('name.png', poto1.apply_ot())
+	matplotlib.image.imsave('marius.png', poto1.apply_ot())
