@@ -31,7 +31,7 @@ def automate_series(path_series: str, name_render: str):
 		for info in list_info_imgs:
 			print(f"- Image référence {i + 1} ({list_name[i]}) sur image cible {j + 1} ({list_name[j]})")
 			if i != j:
-				poto.set_target_all(info[0], info[1], info[2])
+				poto.set_target_all(info[0], info[1], info[2], info[3])
 				poto.train_ot()
 				img_recolored = poto.apply_ot()
 				axs[i, j].imshow(img_recolored)
