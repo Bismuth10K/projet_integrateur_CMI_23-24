@@ -1,13 +1,12 @@
 import time
 
 import matplotlib.image
-from PIL import Image
 from fonctions import *
 
 rng = np.random.RandomState(1)
 
 
-class POTO:
+class POTI:
 	def __init__(self, img_ref, img_tar=None):
 		start = time.time()
 
@@ -35,13 +34,14 @@ class POTO:
 		self.mat_tar = im2mat(img_tar)
 		self.mat_clstr_tar = clustering(self.mat_tar, self.model_clust)
 
-	def set_target_all(self, img, mat, mat_clstr):
+	def set_target_all(self, img, mat, mat_clstr, model_clust):
 		self.img_tar = img
 		self.mat_tar = mat
 		self.mat_clstr_tar = mat_clstr
+		self.model_clust = model_clust
 
 	def get_ref_all(self):
-		return [self.img_ref, self.mat_ref, self.mat_clstr_ref]
+		return [self.img_ref, self.mat_ref, self.mat_clstr_ref, self.model_clust]
 
 	def plot_distribution(self):
 		if self.mat_clstr_tar is not None:
@@ -106,14 +106,14 @@ class POTO:
 
 
 if __name__ == '__main__':
-	path_ref = './source.jpg'
+	path_ref = './photos/control_game_red_room.jpg'
 	img_ref, mat_ref = import_image(path_ref)
 
-	path_tar = './cible.jpg'
+	path_tar = './photos/picture_city.jpg'
 	img_tar, mat_tar = import_image(path_tar)
 
-	poto1 = POTO(img_tar, img_ref)
+	poto1 = POTI(img_ref, img_tar)
 	poto1.plot_photos()
 	poto1.plot_distribution()
 	poto1.train_ot()
-	matplotlib.image.imsave('marius.png', poto1.apply_ot())
+	matplotlib.image.imsave('test_normal.png', poto1.apply_ot())

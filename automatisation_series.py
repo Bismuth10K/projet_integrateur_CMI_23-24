@@ -3,7 +3,7 @@ import time
 
 import matplotlib.pyplot as plt
 
-from POTO import POTO
+from POTI import POTI
 from fonctions import import_image
 
 
@@ -16,7 +16,7 @@ def automate_series(path_series: str, name_render: str):
 		if file.endswith(".png") or file.endswith(".jpg") or file.endswith(".jpeg"):
 			print(f"---Clustering de '{file.title()[:-4]}' (cluster {len(list_obj_poto) + 1})---")
 			img, mat = import_image(os.path.join(path_series, file))
-			cur_poto = POTO(img)
+			cur_poto = POTI(img)
 			list_info_imgs.append(cur_poto.get_ref_all())
 			list_obj_poto.append(cur_poto)
 
