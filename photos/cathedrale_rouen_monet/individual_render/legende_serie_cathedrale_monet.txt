@@ -10,5 +10,5 @@
 10 : Le Portail.jpg
 
 Une ligne contient toutes les images.
-Les couleurs d'une image i sont appliquées à l'ensemble des images (sauf elle même, image à la position (i, i))sur la ligne i.
-Temps d'exécution et de render = 342.36 secondes, soit 5.71 minutes.
+Les couleurs d'une image i sont appliquées à l'ensemble des images (sauf elle même, l'fimage à la position (i, i)) sur la ligne i.
+Temps d'exécution et de render = 345.61 secondes, soit 5.76 minutes.

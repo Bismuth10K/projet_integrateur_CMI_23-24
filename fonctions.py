@@ -65,7 +65,7 @@ def extract_frames(path):
     Entrée: - path(str): Chemin pour accéder à la vidéo
     Sortie: - frames(list): Liste des images qui composent la vidéo
     """
-	cap = cv2.VideoCapture(video_path)
+	cap = cv2.VideoCapture(path)
 	frames = []
 
 	while True:
@@ -135,3 +135,15 @@ def tran_opt(Xs, Xt, X, img_shape, method="emd"):
 	transp_Xs = ot_model.transform(Xs=X)
 	img = minmax(mat2im(transp_Xs, img_shape))
 	return img
+
+def color_image(X, ot_model, img_shape):
+    """
+    Recolorise une image X à partir d'un modèle d'optimal transport entraîné
+    Entrées: - X (matrice): Image à recolorer
+             - ot_model (model OT): Modèle de transport optimal entraîné
+             - img_shape (vector): Dimensions de l'image X
+    Sortie: - img (matrice): Image recolorée
+    """
+    transp_Xs = ot_model.transform(Xs=X)
+    img = minmax(mat2im(transp_Xs, img_shape))
+    return img
