@@ -6,34 +6,36 @@ import matplotlib.pyplot as plt
 
 from POTI import POTI
 from fonctions import import_image
+import numpy as np
 
 
 def automate_series(path_series: str, name_render: str):
 	start = time.time()
-	list_obj_poto = []
+	list_obj_poti = []
 	list_info_imgs = []
 	list_name = os.listdir(path_series)
 	for file in list_name:
 		if file.endswith(".jpg") or file.endswith(".jpeg"):
-			print(f"---Clustering de '{file.title()[:-4]}' (cluster {len(list_obj_poto) + 1})---")
-			img, mat = import_image(os.path.join(path_series, file))
-			cur_poto = POTI(img)
-			list_info_imgs.append(cur_poto.get_ref_all())
-			list_obj_poto.append(cur_poto)
+			print(f"---Clustering de '{file.title()[:-4]}' (cluster {len(list_obj_poti) + 1})---")
+			cur_poti = POTI(os.path.join(path_series, file))
+			list_info_imgs.append(cur_poti.get_ref_all())
+			list_obj_poti.append(cur_poti)
 
 	path_render = os.path.join(path_series + "/individual_render/")
 	if not os.path.exists(path_render):
 		os.makedirs(path_render)
-	fig, axs = plt.subplots(len(list_obj_poto), len(list_obj_poto), figsize=(10, 8))
+	plt.rcParams['figure.dpi'] = 300
+	plt.rcParams['savefig.dpi'] = 300
+	fig, axs = plt.subplots(len(list_obj_poti), len(list_obj_poti), figsize=(10, 8))
 	i = 0
-	for poto in list_obj_poto:
+	for poti in list_obj_poti:
 		j = 0
 		for info in list_info_imgs:
 			print(f"- Image référence {i + 1} ({list_name[i]}) sur image cible {j + 1} ({list_name[j]})")
 			if i != j:
-				poto.set_target_all(info[0], info[1], info[2], info[3])
-				poto.train_ot()
-				img_recolored = poto.apply_ot()
+				poti.set_target_all(info[0], info[1], info[2], info[3])
+				poti.train_ot()
+				img_recolored = poti.apply_ot()
 				axs[i, j].imshow(img_recolored)
 
 				matplotlib.image.imsave(os.path.join(path_render, f"from{i + 1}_to{j + 1}.png"), img_recolored)
@@ -59,8 +61,8 @@ def automate_series(path_series: str, name_render: str):
 	with open(os.path.join(path_render, f"legende_{name_render}.txt"), 'w') as f:
 		f.write(titre + "\n")
 		f.write("Une ligne contient toutes les images.\n")
-		f.write("Les couleurs d'une image i sont appliquées à l'ensemble des images (sauf elle même, image à la "
-				"position (i, i))sur la ligne i.\n")
+		f.write("Les couleurs d'une image i sont appliquées à l'ensemble des images (sauf elle même, l'fimage à la "
+				"position (i, i)) sur la ligne i.\n")
 		f.write(f"Temps d'exécution et de render = {nb_sec} secondes, soit {nb_min} minutes.")
 
 

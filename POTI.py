@@ -12,15 +12,15 @@ class POTI:
 
 		self.model_clust = MiniBatchKMeans(n_clusters=1000, init_size=3000, random_state=2)
 		self.ot_model = None
-		self.img_ref = img_ref
-		self.mat_ref = im2mat(img_ref)
+		self.img_ref = plt.imread(img_ref).astype(np.float64) / 256
+		self.mat_ref = im2mat(self.img_ref)
 		self.mat_clstr_ref = clustering(self.mat_ref, self.model_clust)
 		end_clust_1 = time.time()
 		print(f"Temps de clustering image référence : {round(end_clust_1 - start, 2)}s")
 
 		if img_tar is not None:
-			self.img_tar = img_tar
-			self.mat_tar = im2mat(img_tar)
+			self.img_tar = plt.imread(img_tar).astype(np.float64) / 256
+			self.mat_tar = im2mat(self.img_tar)
 			self.mat_clstr_tar = clustering(self.mat_tar, self.model_clust)
 			end_clust_2 = time.time()
 			print(f"Temps de clustering image cible : {round(end_clust_2 - end_clust_1, 2)}s")
@@ -30,8 +30,8 @@ class POTI:
 			self.mat_clstr_tar = None
 
 	def set_target(self, img_tar):
-		self.img_tar = img_tar
-		self.mat_tar = im2mat(img_tar)
+		self.img_tar = plt.imread(img_tar).astype(np.float64) / 256
+		self.mat_tar = im2mat(self.img_tar)
 		self.mat_clstr_tar = clustering(self.mat_tar, self.model_clust)
 
 	def set_target_all(self, img, mat, mat_clstr, model_clust):
@@ -99,21 +99,16 @@ class POTI:
 		new_img = self.ot_model.transform(Xs=self.mat_clstr_tar)
 		img = minmax(mat2im(new_img, self.mat_clstr_tar.shape))
 		img_col = mat2im(img[self.model_clust.predict(self.mat_tar), :], self.img_tar.shape)
-		# plt.imshow(img_col)
-		# plt.show()
 		print(f"Temps de colorisation : {round(time.time() - start, 2)}s")
 		return img_col
 
 
 if __name__ == '__main__':
-	path_ref = './photos/control_game_red_room.jpg'
-	img_ref, mat_ref = import_image(path_ref)
+	img_ref = './photos/control_game_red_room.jpg'
+	img_tar = './photos/picture_city.jpg'
 
-	path_tar = './photos/picture_city.jpg'
-	img_tar, mat_tar = import_image(path_tar)
-
-	poto1 = POTI(img_ref, img_tar)
-	poto1.plot_photos()
-	poto1.plot_distribution()
-	poto1.train_ot()
-	matplotlib.image.imsave('test_normal.png', poto1.apply_ot())
+	poti1 = POTI(img_ref, img_tar)
+	poti1.plot_photos()
+	poti1.plot_distribution()
+	poti1.train_ot()
+	matplotlib.image.imsave('test_normal.png', poti1.apply_ot())
