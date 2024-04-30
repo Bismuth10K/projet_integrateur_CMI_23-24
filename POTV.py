@@ -7,8 +7,8 @@ rng = np.random.RandomState(1)
 
 
 class POTV(POTI):
-	def __init__(self, img_ref, vid_tar=None):
-		super().__init__(img_ref)
+	def __init__(self, path_img_ref, vid_tar=None):
+		super().__init__(path_img_ref)
 
 		if vid_tar is not None:
 			start_extraction = time.time()
@@ -17,7 +17,7 @@ class POTV(POTI):
 			print(f"Temps extraction frames : {round(end_extraction - start_extraction, 2)}s")
 
 			self.mat_tar = im2mat(self.frames_tar[0])
-			self.mat_clstr_tar = clustering(self.mat_tar, self.model_clust)
+			self.mat_clstr_tar = clustering(self.mat_tar, self.model_cluster)
 			end_clust_1 = time.time()
 			print(f"Temps de clustering frame 1 : {round(end_clust_1 - end_extraction, 2)}s")
 
@@ -50,15 +50,15 @@ class POTV(POTI):
 							"SinkhornTransport \n-'linear': Mapping linéaire \n-'gaussian': Mapping Gaussien")
 
 		try:
-			ot_model.fit(Xs=self.mat_clstr_tar, Xt=self.mat_clstr_ref)
+			ot_model.fit(Xs=self.mat_clstr_tar, Xt=self.mat_cluster_ref)
 			self.ot_model = ot_model
 
 			new_img = self.ot_model.transform(Xs=self.mat_clstr_tar)
 			img = minmax(mat2im(new_img, self.mat_clstr_tar.shape))
-			self.frames_tar[0] = mat2im(img[self.model_clust.predict(self.mat_tar), :], self.frames_tar[0].shape)
+			self.frames_tar[0] = mat2im(img[self.model_cluster.predict(self.mat_tar), :], self.frames_tar[0].shape)
 
 			self.mat_tar = im2mat(self.frames_tar[0])
-			self.mat_clstr_tar = clustering(self.mat_tar, self.model_clust)
+			self.mat_clstr_tar = clustering(self.mat_tar, self.model_cluster)
 
 			print(f"Temps d'entraînement : {round(time.time() - start, 2)}s")
 		except Exception as e:
@@ -70,9 +70,9 @@ class POTV(POTI):
 		start = time.time()
 		for count in range(1, len(self.frames_tar)):
 			mat_img = im2mat(self.frames_tar[count])
-			X = clustering(mat_img, self.model_clust)
+			X = clustering(mat_img, self.model_cluster)
 			mat_col = color_image(X, self.ot_model, X.shape)
-			img_col = mat2im(mat_col[self.model_clust.predict(mat_img), :], self.frames_tar[count].shape)
+			img_col = mat2im(mat_col[self.model_cluster.predict(mat_img), :], self.frames_tar[count].shape)
 			self.frames_tar[count] = img_col
 			print(f"Recolorisation frame {count + 1}/{len(self.frames_tar)} - {round((count + 1) / len(self.frames_tar) * 100, 2)}%")
 
