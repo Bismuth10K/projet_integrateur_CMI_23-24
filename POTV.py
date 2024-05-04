@@ -98,11 +98,12 @@ class POTV(POTI):
 											 cv2.COLOR_RGB2BGR))  # Mettre à l'échelle de 0-1 à 0-255 pour écrire la vidéo
 
 		nb_sec = round(time.time() - start, 2)
-		nb_min = round((nb_sec / 60, 2))
+		nb_min = round(nb_sec / 60, 2)
 		print(f"Temps de colorisation : {nb_sec} secondes, soit {nb_min} minutes.")
 		print("_" * 50)
 		cv2.destroyAllWindows()
-		[video.release() for video in videos]
+		for video in videos:
+			video.release()
 
 	def create_video(self, title_video: list):
 		"""
@@ -130,7 +131,7 @@ if __name__ == '__main__':
 	start = time.time()
 	img_ref = ['./photos/cathedrale_rouen_monet/La Cathédrale de Rouen.jpg', './photos/picture_city.jpg',
 			   './photos/control_game_red_room.jpg']
-	vid_tar = './videos/video_city.mp4'
+	vid_tar = './videos/short_city.mp4'
 
 	list_method = ["emd", "sinkhorn", "linear", "gaussian"]
 
@@ -138,7 +139,7 @@ if __name__ == '__main__':
 		potv1 = POTV(img, vid_tar)
 		potv1.plot_photos()
 		list_model = [potv1.train_ot(method) for method in list_method]
-		potv1.apply_ot(list_model, ["rendu_" + img.split("/")[-1][:-1] + "_" + method for method in list_method])
+		potv1.apply_ot(list_model, ["rendu_" + img.split("/")[-1][:-4] + "_" + method for method in list_method])
 	nb_sec = round(time.time() - start, 2)
 	nb_min = round(nb_sec / 60, 2)
 	print(f"Temps totale de render : {nb_sec}s, soit {nb_min}min.")
