@@ -27,10 +27,6 @@ class POTI:
 		self.img_ref = plt.imread(path_img_ref).astype(np.float64) / 256
 		self.mat_ref = im2mat(self.img_ref)
 		self.mat_cluster_ref = clustering(self.mat_ref, self.model_cluster)
-		print(type(self.img_ref))
-		print(type(self.mat_ref))
-		print(type(self.mat_cluster_ref))
-		print(type(self.model_cluster))
 		end_cluster_1 = time.time()
 		print(f"Temps de clustering image référence : {round(end_cluster_1 - start, 2)}s")
 
