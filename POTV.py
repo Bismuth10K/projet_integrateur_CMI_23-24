@@ -76,9 +76,10 @@ class POTV(POTI):
 		start = time.time()
 
 		height, width, layers = self.frames_tar[0].shape
-		fourcc = cv2.VideoWriter_fourcctoo(*'DIVX')
-		if ot_model is not None and not isinstance(ot_model, list):
-			ot_model = [ot_model]
+		fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+		if ot_model is not None:
+			if not isinstance(ot_model, list):
+				ot_model = [ot_model]
 		else:
 			ot_model = [self.ot_model]
 		videos = [cv2.VideoWriter(title_video[i] + ".avi", fourcc, 30, (width, height)) for i in range(len(ot_model))]
@@ -94,20 +95,20 @@ class POTV(POTI):
 				mat_col = color_image(X, ot_model[i], X.shape)
 				img_col = mat2im(mat_col[self.model_cluster.predict(mat_img), :], self.frames_tar[count].shape)
 
-				videos[i].write(cv2.cvtColor((img_col * 255).astype(np.uint8),
-											 cv2.COLOR_RGB2BGR))  # Mettre à l'échelle de 0-1 à 0-255 pour écrire la vidéo
+				# Mettre à l'échelle de 0-1 à 0-255 pour écrire la vidéo
+				videos[i].write(cv2.cvtColor((img_col * 255).astype(np.uint8), cv2.COLOR_RGB2BGR))
 
 		nb_sec = round(time.time() - start, 2)
 		nb_min = round(nb_sec / 60, 2)
 		print(f"Temps de colorisation : {nb_sec} secondes, soit {nb_min} minutes.")
-		print("_" * 50)
+		print("-" * 50)
 		cv2.destroyAllWindows()
 		for video in videos:
 			video.release()
 
 	def create_video(self, title_video: list):
 		"""
-		Création d'une vidéo (.avi) à partir d'une liste de photos (nupy array)
+		Création d'une vidéo (.avi) à partir d'une liste de photos (numpy array)
 		Entrées: - frames (numpy list of image's pixels): Images that we want to use for the creation of the video
 				 - video_name (str): Name of the video (don't put the .avi)
 				 - path (str): path of the video
