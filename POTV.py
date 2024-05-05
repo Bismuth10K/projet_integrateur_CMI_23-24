@@ -13,13 +13,11 @@ class POTV(POTI):
 		super().__init__(path_img_ref)
 
 		self.new_frames_tar = []
-		self.mat_cluster_tar_2 = None
-		self.mat_tar_2 = None
 		if path_vid_tar is not None:
 			start_extraction = time.time()
 			self.frames_tar = extract_frames(path_vid_tar)
 			end_extraction = time.time()
-			print(f"Temps extraction frames : {round(end_extraction - start_extraction, 2)}s")
+			print(f"Temps extraction des {len(self.frames_tar)} frames : {round(end_extraction - start_extraction, 2)}s.")
 
 			self.mat_tar = im2mat(self.frames_tar[0])
 			self.mat_cluster_tar = clustering(self.mat_tar, self.model_cluster)
@@ -70,11 +68,11 @@ class POTV(POTI):
 			frame0_reconstructed = minmax(mat2im(frame0_recolored, self.mat_cluster_tar.shape))
 			frame0_image = mat2im(frame0_reconstructed[self.model_cluster.predict(self.mat_tar), :], self.frames_tar[0].shape)
 
-			self.mat_tar_2 = im2mat(frame0_image)
-			self.mat_cluster_tar_2 = clustering(self.mat_tar_2, self.model_cluster)
+			mat_tar_2 = im2mat(frame0_image)
+			mat_cluster_tar_2 = clustering(mat_tar_2, self.model_cluster)
 
 			# TODO le souci est que la première frame doit sauter car on a pas trié en fonction de la méthode
-			ot_model.fit(Xs=self.mat_cluster_tar, Xt=self.mat_cluster_tar_2)
+			ot_model.fit(Xs=self.mat_cluster_tar, Xt=mat_cluster_tar_2)
 			self.ot_model = ot_model
 
 			print(f"Temps d'entraînement {method} : {round(time.time() - start, 2)}s")
@@ -118,8 +116,9 @@ class POTV(POTI):
 
 if __name__ == '__main__':
 	start = time.time()
-	img_ref = ['./photos/cathedrale_rouen_monet/La Cathédrale de Rouen.jpg', './photos/picture_city.jpg',
-			   './photos/control_game_red_room.jpg']
+	img_ref = ['./photos/picture_city.jpg',
+			   './photos/control_game_red_room.jpg',
+			   './photos/cathedrale_rouen_monet/La Cathédrale de Rouen.jpg']
 	vid_tar = './videos/video_city.mp4'
 
 	list_method = ["emd", "sinkhorn", "linear", "gaussian"]
@@ -127,7 +126,9 @@ if __name__ == '__main__':
 	list_model = []
 	potv1 = POTV(img_ref[0], vid_tar)
 	list_model.extend([potv1.train_ot(method) for method in list_method])
+
 	for img in range(1, len(img_ref)):
+		potv1.set_reference(img_ref[img])
 		list_model.extend([potv1.train_ot(method) for method in list_method])
 	nb_sec = round(time.time() - start, 2)
 	nb_min = round(nb_sec / 60, 2)
