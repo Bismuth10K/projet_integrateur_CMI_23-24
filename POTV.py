@@ -1,5 +1,7 @@
 import time
 
+import matplotlib.pyplot as plt
+
 from POTI import POTI
 from fonctions import *
 
@@ -23,6 +25,14 @@ class POTV(POTI):
 			self.mat_cluster_tar = clustering(self.mat_tar, self.model_cluster)
 			end_clust_1 = time.time()
 			print(f"Temps de clustering frame 1 : {round(end_clust_1 - end_extraction, 2)}s")
+
+	def set_reference(self, path_img_ref: str):
+		start = time.time()
+		self.img_ref = plt.imread(path_img_ref).astype(np.float64) / 256
+		self.mat_ref = im2mat(self.img_ref)
+		self.mat_cluster_ref = clustering(self.mat_ref, self.model_cluster)
+		end_cluster_1 = time.time()
+		print(f"Temps de clustering nouvelle référence : {round(end_cluster_1 - start, 2)}s")
 
 	def plot_photos(self):
 		if self.frames_tar is not None:
@@ -56,11 +66,11 @@ class POTV(POTI):
 			ot_model.fit(Xs=self.mat_cluster_tar, Xt=self.mat_cluster_ref)
 			self.ot_model = ot_model
 
-			new_img = self.ot_model.transform(Xs=self.mat_cluster_tar)
-			img = minmax(mat2im(new_img, self.mat_cluster_tar.shape))
-			new_img_created = mat2im(img[self.model_cluster.predict(self.mat_tar), :], self.frames_tar[0].shape)
+			frame0_recolored = self.ot_model.transform(Xs=self.mat_cluster_tar)
+			frame0_reconstructed = minmax(mat2im(frame0_recolored, self.mat_cluster_tar.shape))
+			frame0_image = mat2im(frame0_reconstructed[self.model_cluster.predict(self.mat_tar), :], self.frames_tar[0].shape)
 
-			self.mat_tar_2 = im2mat(new_img_created)
+			self.mat_tar_2 = im2mat(frame0_image)
 			self.mat_cluster_tar_2 = clustering(self.mat_tar_2, self.model_cluster)
 
 			# TODO le souci est que la première frame doit sauter car on a pas trié en fonction de la méthode
@@ -82,10 +92,9 @@ class POTV(POTI):
 				ot_model = [ot_model]
 		else:
 			ot_model = [self.ot_model]
-		videos = [cv2.VideoWriter(title_video[i] + ".avi", fourcc, 30, (width, height)) for i in range(len(ot_model))]
+		videos = [cv2.VideoWriter(title_video[i] + ".mkv", fourcc, 30, (width, height)) for i in range(len(ot_model))]
 
-		print(f"Recolorisation frame 1/{len(self.frames_tar)} - {round(1 / len(self.frames_tar) * 100, 2)}%")
-		for count in range(1, len(self.frames_tar)):
+		for count in range(len(self.frames_tar)):
 			print(
 				f"Recolorisation frame {count + 1}/{len(self.frames_tar)} - {round((count + 1) / len(self.frames_tar) * 100, 2)}%")
 			mat_img = im2mat(self.frames_tar[count])
@@ -106,41 +115,26 @@ class POTV(POTI):
 		for video in videos:
 			video.release()
 
-	def create_video(self, title_video: list):
-		"""
-		Création d'une vidéo (.avi) à partir d'une liste de photos (numpy array)
-		Entrées: - frames (numpy list of image's pixels): Images that we want to use for the creation of the video
-				 - video_name (str): Name of the video (don't put the .avi)
-				 - path (str): path of the video
-		"""
-		for video_i in range(len(self.new_frames_tar)):
-			print(f"__Rendu vidéo n°{video_i}__")
-			height, width, layers = self.new_frames_tar[video_i][0].shape
-			fourcc = cv2.VideoWriter_fourcc(*'DIVX')
-			video = cv2.VideoWriter(title_video[video_i] + ".avi", fourcc, 30, (width, height))
-			i = 1
-			for frame in self.new_frames_tar[video_i]:
-				print(f"\tReconstruction frame {i}")
-				i += 1
-				video.write(cv2.cvtColor((frame * 255).astype(np.uint8),
-										 cv2.COLOR_RGB2BGR))  # Mettre à l'échelle de 0-1 à 0-255 pour écrire la vidéo
-			cv2.destroyAllWindows()
-			video.release()
-
 
 if __name__ == '__main__':
 	start = time.time()
 	img_ref = ['./photos/cathedrale_rouen_monet/La Cathédrale de Rouen.jpg', './photos/picture_city.jpg',
 			   './photos/control_game_red_room.jpg']
-	vid_tar = './videos/short_city.mp4'
+	vid_tar = './videos/video_city.mp4'
 
 	list_method = ["emd", "sinkhorn", "linear", "gaussian"]
 
-	for img in img_ref:
-		potv1 = POTV(img, vid_tar)
-		potv1.plot_photos()
-		list_model = [potv1.train_ot(method) for method in list_method]
-		potv1.apply_ot(list_model, ["rendu_" + img.split("/")[-1][:-4] + "_" + method for method in list_method])
+	list_model = []
+	potv1 = POTV(img_ref[0], vid_tar)
+	list_model.extend([potv1.train_ot(method) for method in list_method])
+	for img in range(1, len(img_ref)):
+		list_model.extend([potv1.train_ot(method) for method in list_method])
+	nb_sec = round(time.time() - start, 2)
+	nb_min = round(nb_sec / 60, 2)
+	print(f"Temps d'entraînement total : {nb_sec}s, soit {nb_min}min.")
+
+	titles = ["rendu_" + img.split("/")[-1][:-4] + "_" + method for img in img_ref for method in list_method]
+	potv1.apply_ot(list_model, titles)
 	nb_sec = round(time.time() - start, 2)
 	nb_min = round(nb_sec / 60, 2)
 	print(f"Temps totale de render : {nb_sec}s, soit {nb_min}min.")
