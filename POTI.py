@@ -85,14 +85,14 @@ class POTI:
 
 		Returns
 		-------
-		Tableau contenant dans l'ordre : l'image, sa matrice, la matrice du cluster, le modèle de cluster.
+		Tableau contenant dans l'ordre : L'image, sa matrice, la matrice du cluster, le modèle de cluster.
 		"""
 		return [self.img_ref, self.mat_ref, self.mat_cluster_ref, self.model_cluster]
 
 	def plot_distribution(self):
 		"""
 		Affichage des distributions des couleurs des images.
-		S'il n'y a pas l'image cible, on affichera seulement pour l'image référence.
+		S'il n'y a pas l'image cible, on affichera seulement celle de l'image référence.
 		"""
 		if self.mat_cluster_tar is not None:
 			fig, axs = plt.subplots(2)
@@ -106,7 +106,7 @@ class POTI:
 	def plot_photos(self):
 		"""
 		Affichage des images.
-		S'il n'y a pas l'image cible, on affichera seulement pour l'image référence.
+		S'il n'y a pas l'image cible, on affichera seulement l'image référence.
 		"""
 		if self.img_tar is not None:
 			fig, axs = plt.subplots(2)
@@ -140,9 +140,9 @@ class POTI:
 		elif method == "sinkhorn":
 			ot_model = ot.da.SinkhornTransport(reg_e=1e-1)
 		elif method == "linear":
-			ot_model = ot.da.MappingTransport(mu=1e0, eta=1e-8, bias=True, max_iter=20, verbose=True)
+			ot_model = ot.da.MappingTransport(mu=1e0, eta=1e-8, bias=True, max_iter=20)
 		elif method == "gaussian":
-			ot_model = ot.da.MappingTransport(mu=1e0, eta=1e-2, sigma=1, bias=False, max_iter=10, verbose=True)
+			ot_model = ot.da.MappingTransport(mu=1e0, eta=1e-2, sigma=1, bias=False, max_iter=10)
 		else:
 			raise Exception("Les quatre choix de modèles sont :\n- 'emd' : EMDTransport \n-'sinkhorn': "
 							"SinkhornTransport \n-'linear': Mapping linéaire \n-'gaussian': Mapping Gaussien")

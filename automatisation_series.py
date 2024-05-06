@@ -5,11 +5,22 @@ import matplotlib.image
 import matplotlib.pyplot as plt
 
 from POTI import POTI
-from fonctions import import_image
-import numpy as np
 
 
 def automate_series(path_series: str, name_render: str):
+	"""
+	Cette fonction automatise le render d'une série d'images.
+	Elle crée toutes les images recolorisées et les enregistre séparément et en groupe sur un plot spécifique.
+	Un paramètre pourra être fait pour gérer les rendus (si on veut des individuelles ou pas).
+
+	En plus de ces images, elle génère un txt avec la légende des images et des informations complementaires tells que
+	le temps de compilation.
+
+	Parameters
+	----------
+	path_series (str) : chemin vers les images
+	name_render (str) : nom du plot avec toutes les images
+	"""
 	start = time.time()
 	list_obj_poti = []
 	list_info_imgs = []
@@ -61,7 +72,7 @@ def automate_series(path_series: str, name_render: str):
 	with open(os.path.join(path_render, f"legende_{name_render}.txt"), 'w') as f:
 		f.write(titre + "\n")
 		f.write("Une ligne contient toutes les images.\n")
-		f.write("Les couleurs d'une image i sont appliquées à l'ensemble des images (sauf elle même, l'fimage à la "
+		f.write("Les couleurs d'une image i sont appliquées à l'ensemble des images (sauf elle même, l'image à la "
 				"position (i, i)) sur la ligne i.\n")
 		f.write(f"Temps d'exécution et de render = {nb_sec} secondes, soit {nb_min} minutes.")
 
