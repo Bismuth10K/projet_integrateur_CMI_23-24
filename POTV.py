@@ -1,7 +1,5 @@
 import time
 
-import matplotlib.pyplot as plt
-
 from POTI import POTI
 from fonctions import *
 
@@ -25,7 +23,7 @@ class POTV(POTI):
 		"""
 		super().__init__(path_img_ref)
 
-		self.new_frames_tar = []
+		self.frames_tar = []
 		if path_vid_tar is not None:
 			start_extraction = time.time()
 			self.frames_tar = extract_frames(path_vid_tar)
@@ -100,12 +98,11 @@ class POTV(POTI):
 
 		try:
 			ot_model.fit(Xs=self.mat_cluster_tar, Xt=self.mat_cluster_ref)
-			self.ot_model = ot_model
 
-			frame0_recolored = self.ot_model.transform(Xs=self.mat_cluster_tar)
+			frame0_recolored = ot_model.transform(Xs=self.mat_cluster_tar)
 			frame0_reconstructed = minmax(mat2im(frame0_recolored, self.mat_cluster_tar.shape))
 			frame0_image = mat2im(frame0_reconstructed[self.model_cluster.predict(self.mat_tar), :],
-								  self.frames_tar[0].shape)
+								self.frames_tar[0].shape)
 
 			mat_tar_2 = im2mat(frame0_image)
 			mat_cluster_tar_2 = clustering(mat_tar_2, self.model_cluster)
@@ -149,8 +146,7 @@ class POTV(POTI):
 			X = clustering(mat_img, self.model_cluster)
 
 			for i in range(len(ot_model)):
-				mat_col = color_image(X, ot_model[i], X.shape)
-				img_col = mat2im(mat_col[self.model_cluster.predict(mat_img), :], self.frames_tar[count].shape)
+				img_col = color_image(self.frames_tar[count], X, ot_model[i], self.model_cluster)
 
 				# Mettre à l'échelle de 0-1 à 0-255 pour écrire la vidéo
 				videos[i].write(cv2.cvtColor((img_col * 255).astype(np.uint8), cv2.COLOR_RGB2BGR))

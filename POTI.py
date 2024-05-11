@@ -89,7 +89,7 @@ class POTI:
 		"""
 		return [self.img_ref, self.mat_ref, self.mat_cluster_ref, self.model_cluster]
 
-	def plot_distribution(self):
+	def plot_distributions(self):
 		"""
 		Affichage des distributions des couleurs des images.
 		S'il n'y a pas l'image cible, on affichera seulement celle de l'image référence.
@@ -177,6 +177,6 @@ if __name__ == '__main__':
 
 	poti1 = POTI(img_ref, img_tar)
 	poti1.plot_photos()
-	poti1.plot_distribution()
+	poti1.plot_distributions()
 	poti1.train_ot()
 	matplotlib.image.imsave('test_normal.png', poti1.apply_ot())
