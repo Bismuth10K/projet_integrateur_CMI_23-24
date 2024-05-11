@@ -25,12 +25,19 @@ def automate_series(path_series: str, name_render: str):
 	list_obj_poti = []
 	list_info_imgs = []
 	list_name = os.listdir(path_series)
-	for file in list_name:
-		if file.endswith(".jpg") or file.endswith(".jpeg"):
-			print(f"---Clustering de '{file.title()[:-4]}' (cluster {len(list_obj_poti) + 1})---")
-			cur_poti = POTI(os.path.join(path_series, file))
+
+	titre = ""
+	file = 0
+	while file < len(list_name):
+		if list_name[file].endswith(".jpg") or list_name[file].endswith(".jpeg"):
+			print(f"---Clustering de '{list_name[file].title()[:-4]}' (cluster {len(list_obj_poti) + 1})---")
+			cur_poti = POTI(os.path.join(path_series, list_name[file]))
 			list_info_imgs.append(cur_poti.get_ref_all())
 			list_obj_poti.append(cur_poti)
+			titre += f"{file + 1} : {list_name[file]}\n"
+			file += 1
+		else:
+			list_name.remove(list_name[file])
 
 	path_render = os.path.join(path_series + "/individual_render/")
 	if not os.path.exists(path_render):
@@ -56,7 +63,7 @@ def automate_series(path_series: str, name_render: str):
 			axs[i, j].label_outer()
 			axs[i, j].spines[['top', 'right', 'left', 'bottom']].set_visible(False)
 			axs[i, j].tick_params(left=False, right=False, labelleft=False,
-								labelbottom=False, bottom=False)
+								  labelbottom=False, bottom=False)
 			j += 1
 		i += 1
 	fig.suptitle("Série 'Cathédrale de Rouen' par Monet")
@@ -66,9 +73,6 @@ def automate_series(path_series: str, name_render: str):
 	nb_min = round(nb_sec / 60, 2)
 	print(f"Durée totale : {nb_sec}s - {nb_min}min")
 
-	titre = ""
-	for i in range(len(list_name)):
-		titre += f"{i + 1} : {list_name[i]}\n"
 	with open(os.path.join(path_render, f"legende_{name_render}.txt"), 'w') as f:
 		f.write(titre + "\n")
 		f.write("Une ligne contient toutes les images.\n")
