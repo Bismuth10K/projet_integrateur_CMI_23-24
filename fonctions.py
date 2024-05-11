@@ -9,29 +9,29 @@ rng = np.random.RandomState(1)
 
 def im2mat(img):
 	"""
-    Convertie une image en matrice (un pixel par ligne)
-    Entrée : - img(matrix): Image que l'on cherche à transformer en matrice
-    Sortie : Matrice obtenue après le reshape
-    """
+	Convertie une image en matrice (un pixel par ligne)
+	Entrée : - img(matrix): Image que l'on cherche à transformer en matrice
+	Sortie : Matrice obtenue après le reshape
+	"""
 	return img.reshape((img.shape[0] * img.shape[1], img.shape[2]))
 
 
 def mat2im(X, shape):
 	"""
-    Convertie une matrice en image
-    Entrées: - X(matrice): Matrice que l'on veut convertir en image
-             - shape(list): Dimensions de l'image attendue
-    Sortie: Image obtenue
-    """
+	Convertie une matrice en image
+	Entrées: - X(matrice): Matrice que l'on veut convertir en image
+			 - shape(list): Dimensions de l'image attendue
+	Sortie: Image obtenue
+	"""
 	return X.reshape(shape)
 
 
 def minmax(img):
 	"""
-    Limite les valeurs de l'image entre 0 et 1.
-    Entrée: - img(matrice): Image à modifier
-    Sortie: - np.clip(img,0,1)(matrice): Image avec des valeurs uniquement entre 0 et 1
-    """
+	Limite les valeurs de l'image entre 0 et 1.
+	Entrée: - img(matrice): Image à modifier
+	Sortie: - np.clip(img,0,1)(matrice): Image avec des valeurs uniquement entre 0 et 1
+	"""
 	return np.clip(img, 0, 1)
 
 
@@ -61,11 +61,11 @@ def print_image(ax, img, title):
 
 def extract_frames(path):
 	"""
-    Récupère les images d'une vidéo
-    Entrée: - path(str): Chemin pour accéder à la vidéo
-    Sortie: - frames(list): Liste des images qui composent la vidéo
-    """
-	cap = cv2.VideoCapture(video_path)
+	Récupère les images d'une vidéo
+	Entrée: - path(str): Chemin pour accéder à la vidéo
+	Sortie: - frames(list): Liste des images qui composent la vidéo
+	"""
+	cap = cv2.VideoCapture(path)
 	frames = []
 
 	while True:
@@ -80,13 +80,13 @@ def extract_frames(path):
 	return frames
 
 
-def clustering(X, model_clust=MiniBatchKMeans(n_clusters=1000, init_size = 3000, random_state=2)):
+def clustering(X, model_clust=MiniBatchKMeans(n_clusters=1000, init_size=3000, random_state=2)):
 	"""
-    Applique un clustering sur deux matrices d'images (Les valeurs de X doivent être entre 0 et 1).
-    Entrées: - X1(matrice): Matrice de la première image
-             - model_clust(model scikit learn): Modèle de clustering
-    Sortie: - Xs(matrice): Matrice après le clustering
-    """
+	Applique un clustering sur deux matrices d'images (Les valeurs de X doivent être entre 0 et 1).
+	Entrées: - X1(matrice): Matrice de la première image
+			 - model_cluster(model scikit learn): Modèle de clustering
+	Sortie: - Xs(matrice): Matrice après le clustering
+	"""
 	idx1 = rng.randint(X.shape[0], size=(500,))
 	clust1 = model_clust.fit(X)
 	Xs = np.clip(clust1.cluster_centers_, 0, 1)
@@ -135,3 +135,25 @@ def tran_opt(Xs, Xt, X, img_shape, method="emd"):
 	transp_Xs = ot_model.transform(Xs=X)
 	img = minmax(mat2im(transp_Xs, img_shape))
 	return img
+
+
+def color_image(img_target, mat_target, ot_model, model_clust):
+	"""
+	Recolorise une image à partir d'un modèle d'optimal transport entraîné.
+
+	Parameters
+	----------
+	img_target : Image à recoloriser
+	mat_target : Matrice (de préférence clusterisée) de l'image à recoloriser
+	ot_model : Modèle de transport optimal entraîné
+	model_clust : Modèle de clustering
+
+	Returns
+	-------
+	Renvoie img_target avec les nouvelles couleurs.
+	"""
+
+	img_recolored = ot_model.transform(Xs=mat_target)
+	img_reconstructed = minmax(mat2im(img_recolored, mat_target.shape))
+	img_image = mat2im(img_reconstructed[model_clust.predict(im2mat(img_target)), :], img_target.shape)
+	return img_image
