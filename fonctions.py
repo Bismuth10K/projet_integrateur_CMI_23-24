@@ -137,14 +137,23 @@ def tran_opt(Xs, Xt, X, img_shape, method="emd"):
 	return img
 
 
-def color_image(X, ot_model, img_shape):
+def color_image(img_target, mat_target, ot_model, model_clust):
 	"""
-	Recolorise une image X à partir d'un modèle d'optimal transport entraîné
-	Entrées: - X (matrice): Image à recolorer
-			 - ot_model (model OT): Modèle de transport optimal entraîné
-			 - img_shape (vector): Dimensions de l'image X
-	Sortie: - img (matrice): Image recolorée
+	Recolorise une image à partir d'un modèle d'optimal transport entraîné.
+
+	Parameters
+	----------
+	img_target : Image à recoloriser
+	mat_target : Matrice (de préférence clusterisée) de l'image à recoloriser
+	ot_model : Modèle de transport optimal entraîné
+	model_clust : Modèle de clustering
+
+	Returns
+	-------
+	Renvoie img_target avec les nouvelles couleurs.
 	"""
-	transp_Xs = ot_model.transform(Xs=X)
-	img = minmax(mat2im(transp_Xs, img_shape))
-	return img
+
+	img_recolored = ot_model.transform(Xs=mat_target)
+	img_reconstructed = minmax(mat2im(img_recolored, mat_target.shape))
+	img_image = mat2im(img_reconstructed[model_clust.predict(im2mat(img_target)), :], img_target.shape)
+	return img_image
