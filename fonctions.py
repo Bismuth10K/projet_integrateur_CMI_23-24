@@ -161,29 +161,25 @@ def color_image(img_target, mat_target, ot_model, model_clust):
 
 class video_son:
 
-     #fonction d'initialisation   
+    # Fonction d'initialisation   
     def __init__(self,video1,audio_recupe,video2,final_video):
         self.video1=video1 #chemin de la video de base
         self.audio_recupe=audio_recupe #chemin de l'audio de la video de base
         self.video2=video2 #chemin de la video cible
         self.final_video=final_video #chemin de video cible avec le nouveau son 
         
-    #fonction qui permet de recuper le son de la video
+    # Fonction qui permet de recuper le son de la video
     def recuper_son_video(self):
         """
         Extrait le son d'une vidéo et le sauvegarde dans un fichier audio.
         
         Parameters
         ----------
-        video1 : string
-            Chemin de la vidéo source
-            
-        chemin_audio : string
-            Chemin de sortie pour le fichier audio
+        self : instance de la classe video_son
             
         Returns
         -------
-        audio : l'audio de la vidéo
+        self.audio_recupe : l'audio de la vidéo
         """
         # Chargement de la vidéo
         video=VideoFileClip(self.video1)
@@ -197,21 +193,14 @@ class video_son:
         
         return self.audio_recupe
 
-    #fonction qui permet de mettre le son sur une autre video
+    # Fonction qui permet de mettre le son sur une autre video
     def ajout_son_video(self):
         """
         Ajoute une piste audio à une vidéo et sauvegarde le résultat dans un fichier.
         
         Parameters
         ----------
-        video1 : string
-            Chemin de la vidéo source
-            
-        chemin_audio : string
-            Chemin de la piste audio à ajouter
-            
-        video2 : string
-            Chemin de la vidéo sans son
+        self : instance de la classe video_son
             
         Returns
         -------
