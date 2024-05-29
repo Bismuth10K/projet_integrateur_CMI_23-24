@@ -4,6 +4,6 @@ rôle : indique le numéro de la frame sur laquelle le clustering se fait et à 
 """
 from tqdm import tqdm
 import time
-for i in tqdm (range(10), desc="Work in progress"):
+for i in tqdm (range(10), desc="Work in progress", unit="%", unit_scale=True, leave=True):
     time.sleep(1)
 
