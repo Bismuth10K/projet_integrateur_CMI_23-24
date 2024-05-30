@@ -19,10 +19,9 @@ class POTV(POTI):
 		Parameters
 		----------
 		path_img_ref (str) : Chemin vers l'image de référence
-		path_vid_tar (str) : Chemin vers la vidéo cible
+		path_vid_tar (str) : Chemin vers l'image cible
 		"""
 		super().__init__(path_img_ref)
-		self.path_vid_tar=path_vid_tar 
 
 		self.frames_tar = []
 		if path_vid_tar is not None:
@@ -36,7 +35,6 @@ class POTV(POTI):
 			self.mat_cluster_tar = clustering(self.mat_tar, self.model_cluster)
 			end_clust_1 = time.time()
 			print(f"Temps de clustering frame 1 : {round(end_clust_1 - end_extraction, 2)}s")
-		
 
 	def set_reference(self, path_img_ref: str):
 		"""
@@ -161,14 +159,6 @@ class POTV(POTI):
 		for video in videos:
 			video.release()
 
-		# Ajout de l'audio de la vidéo de référence à la vidéo cible recolorisée
-		audio_recupe='./videos/audio.wav'  # Chemin pour sauvegarder l'audio extrait
-		final_video_with_audio = title_video[0] + ".mkv" # Chemin de la vidéo finale avec l'audio ajouté
-		video_with_audio = video_son(self.path_vid_tar, audio_recupe,final_video_with_audio, final_video_with_audio)
-		video_with_audio.ajout_son_video()
-
-
-
 
 if __name__ == '__main__':
 	start = time.time()
@@ -195,4 +185,3 @@ if __name__ == '__main__':
 	nb_sec = round(time.time() - start, 2)
 	nb_min = round(nb_sec / 60, 2)
 	print(f"Temps totale de render : {nb_sec}s, soit {nb_min}min.")
-
