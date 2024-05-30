@@ -163,9 +163,10 @@ class POTV(POTI):
 
 		# Ajout de l'audio de la vidéo de référence à la vidéo cible recolorisée
 		audio_recupe='./videos/audio.wav'  # Chemin pour sauvegarder l'audio extrait
-		final_video_with_audio = title_video[0] + ".mkv" # Chemin de la vidéo finale avec l'audio ajouté
-		video_with_audio = video_son(self.path_vid_tar, audio_recupe,final_video_with_audio, final_video_with_audio)
-		video_with_audio.ajout_son_video()
+		for title in title_video:
+			final_video_with_audio = "./videos/" + title + ".mkv" # Chemin de la vidéo finale avec l'audio ajouté
+			video_with_audio = video_son(self.path_vid_tar, audio_recupe, title + ".mkv", final_video_with_audio)
+			video_with_audio.ajout_son_video()
 
 
 
