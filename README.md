@@ -3,16 +3,16 @@
 Voici le projet intégrateur des CMI de l'UBS pour l'année scolaire 2023-2024.
 Nous devons appliquer une méthode permettant de changer les couleurs d'une image ou d'une vidéo pour les couleurs d'une image de référence, et ce graĉe la bibliothèque [POT](https://github.com/PythonOT/POT).
 
-# Exécution
-Cette section devra encore être développée à l'avenir lorsque le code sera plus avancé.
+La classe POTI permet de recoloriser des images, POTV des vidéos.
 
 ## Dépendances
 Plusieurs dépendances sont nécessaires, voici la commande `pip` :
+
 ```bash
-$ pip install opencv-python pot matplotlib scikit-learn numpy
+$ pip install opencv-python pot matplotlib scikit-learn numpy tqdm moviepy tensorflow
 ```
 
-> Vous pouvez les placer dans un environnement virtuel en utilisant les commandes suivantes
+> Vous pouvez éventuellement les installer dans un environnement virtuel en utilisant les commandes suivantes.
 > (*À faire avant d'installer les dépendances*) :
 
 ### Linux
@@ -21,16 +21,20 @@ $ python -m venv .venv
 $ source .venv/bin/activate
 ```
 
-### Windows
-*À venir*
-
 ## Lancement
-Le repo contient plusieurs scripts qui ne sont pas encore rangés.
+Le repo contient plusieurs scripts.
 
-- `notebook.ipynb` est le fichier Jupyter de base où nous avons fait les premiers tests.
-Sachant qu'il marche, vous pouvez l'exécuter afin de comprendre le fonctionnement du POT.
-- `POTO.py` est le fichier contenant la classe POTO afin de transformer une image.
-Le fichier doit encore être commenté, mais vous trouverez un exemple de code dans le bas du script, vous pouvez modifier les chemins des images source et cible.
-- `automatisation_series.py` permet d'automatiser un *render* sur toutes les images d'un dossier.
-Vous pouvez, là aussi, modifier le chemin contenant des images.
-- `fonctions.py` contient plusieurs fonctions utiles au fonctionnement de `POTO.py`
+- [`notebook.ipynb`](./notebook.ipynb) : Premiers programmes pour appréhender l'outil.
+- [`fonctions.py`](./fonctions.py) : Ensemble de fonctions utiles au traitement du transport optimal et des images.
+- [`POTI.py`](./POTI.py) (*Python Optimal Transport for Images*) : Classe permettant d'appliquer un transport optimal d'une image vers une autre.
+- [`POTV.py`](./POTV.py) (*Python Optimal Transport for Videos*) : Classe permettant d'appliquer un transport optimal d'une image vers une vidéo. 
+- [`automatisation_series.py`](./automatisation_series.py) : Expérience annexe permettant de coloriser plusieurs images entre elles.
+- [`style_transfert.ipynb`](./style_transfer.ipynb) : Notebook pour les transferts de caractéristiques par réseaux de convolution.
+- [`videoson.py`](./videoson.py) : Pour récupérer le son et l'ajouter aux nouvelles vidéos.
+
+Vous pouvez lancer le script [`runner.py`](./runner.py) et taper le numéro de ce que vous souhaitez exécuter.
+Sinon, vous pouvez vous inspirer des morceaux de codes dans ce script et lancer avec vos propres images/vidéos.
+
+### *Disclaimer*
+Pour les images, convertissez-les en .jpg.
+Cela ne marche pas pour les .png.
