@@ -3,10 +3,6 @@ import numpy as np
 import ot
 from matplotlib import pyplot as plt
 from sklearn.cluster import MiniBatchKMeans
-from video_son import video_son
-
-
-rng = np.random.RandomState(1)
 
 
 def im2mat(img):
@@ -89,7 +85,6 @@ def clustering(X, model_clust=MiniBatchKMeans(n_clusters=1000, init_size=3000, r
 			 - model_cluster(model scikit learn): Modèle de clustering
 	Sortie: - Xs(matrice): Matrice après le clustering
 	"""
-	idx1 = rng.randint(X.shape[0], size=(500,))
 	clust1 = model_clust.fit(X)
 	Xs = np.clip(clust1.cluster_centers_, 0, 1)
 	return Xs

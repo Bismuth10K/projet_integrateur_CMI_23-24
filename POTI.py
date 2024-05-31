@@ -1,7 +1,5 @@
 import time
 
-import matplotlib.image
-
 from fonctions import *
 
 
@@ -169,14 +167,3 @@ class POTI:
 		img_col = mat2im(img[self.model_cluster.predict(self.mat_tar), :], self.img_tar.shape)
 		print(f"Temps de colorisation : {round(time.time() - start, 2)}s")
 		return img_col
-
-
-if __name__ == '__main__':
-	img_ref = './photos/control_game_red_room.jpg'
-	img_tar = './photos/picture_city.jpg'
-
-	poti1 = POTI(img_ref, img_tar)
-	poti1.plot_photos()
-	poti1.plot_distributions()
-	poti1.train_ot()
-	matplotlib.image.imsave('test_normal.png', poti1.apply_ot())

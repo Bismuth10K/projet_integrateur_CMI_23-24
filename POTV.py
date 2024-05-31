@@ -2,8 +2,7 @@ import time
 
 from POTI import POTI
 from fonctions import *
-
-rng = np.random.RandomState(1)
+from videoson import VideoSon
 
 
 class POTV(POTI):
@@ -22,7 +21,7 @@ class POTV(POTI):
 		path_vid_tar (str) : Chemin vers la vidéo cible
 		"""
 		super().__init__(path_img_ref)
-		self.path_vid_tar=path_vid_tar 
+		self.path_vid_tar = path_vid_tar
 
 		self.frames_tar = []
 		if path_vid_tar is not None:
@@ -36,7 +35,6 @@ class POTV(POTI):
 			self.mat_cluster_tar = clustering(self.mat_tar, self.model_cluster)
 			end_clust_1 = time.time()
 			print(f"Temps de clustering frame 1 : {round(end_clust_1 - end_extraction, 2)}s")
-		
 
 	def set_reference(self, path_img_ref: str):
 		"""
@@ -104,7 +102,7 @@ class POTV(POTI):
 			frame0_recolored = ot_model.transform(Xs=self.mat_cluster_tar)
 			frame0_reconstructed = minmax(mat2im(frame0_recolored, self.mat_cluster_tar.shape))
 			frame0_image = mat2im(frame0_reconstructed[self.model_cluster.predict(self.mat_tar), :],
-								self.frames_tar[0].shape)
+								  self.frames_tar[0].shape)
 
 			mat_tar_2 = im2mat(frame0_image)
 			mat_cluster_tar_2 = clustering(mat_tar_2, self.model_cluster)
@@ -162,38 +160,8 @@ class POTV(POTI):
 			video.release()
 
 		# Ajout de l'audio de la vidéo de référence à la vidéo cible recolorisée
-		audio_recupe='./videos/audio.wav'  # Chemin pour sauvegarder l'audio extrait
+		audio_recupe = './videos/audio.wav'  # Chemin pour sauvegarder l'audio extrait
 		for title in title_video:
-			final_video_with_audio = "./videos/" + title + ".mkv" # Chemin de la vidéo finale avec l'audio ajouté
-			video_with_audio = video_son(self.path_vid_tar, audio_recupe, title + ".mkv", final_video_with_audio)
+			final_video_with_audio = "./videos/" + title + ".mkv"  # Chemin de la vidéo finale avec l'audio ajouté
+			video_with_audio = VideoSon(self.path_vid_tar, audio_recupe, title + ".mkv", final_video_with_audio)
 			video_with_audio.ajout_son_video()
-
-
-
-
-if __name__ == '__main__':
-	start = time.time()
-	img_ref = ['./photos/picture_city.jpg',
-			   './photos/control_game_red_room.jpg',
-			   './photos/cathedrale_rouen_monet/La Cathédrale de Rouen.jpg']
-	vid_tar = './videos/short_city.mp4'
-
-	list_method = ["emd", "sinkhorn", "linear", "gaussian"]
-
-	list_model = []
-	potv1 = POTV(img_ref[0], vid_tar)
-	list_model.extend([potv1.train_ot(method) for method in list_method])
-
-	for img in range(1, len(img_ref)):
-		potv1.set_reference(img_ref[img])
-		list_model.extend([potv1.train_ot(method) for method in list_method])
-	nb_sec = round(time.time() - start, 2)
-	nb_min = round(nb_sec / 60, 2)
-	print(f"Temps d'entraînement total : {nb_sec}s, soit {nb_min}min.")
-
-	titles = ["test_" + img.split("/")[-1][:-4] + "_" + method for img in img_ref for method in list_method]
-	potv1.apply_ot(list_model, titles)
-	nb_sec = round(time.time() - start, 2)
-	nb_min = round(nb_sec / 60, 2)
-	print(f"Temps totale de render : {nb_sec}s, soit {nb_min}min.")
-
