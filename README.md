@@ -36,5 +36,11 @@ Vous pouvez lancer le script [`runner.py`](./runner.py) et taper le numéro de c
 Sinon, vous pouvez vous inspirer des morceaux de codes dans ce script et lancer avec vos propres images/vidéos.
 
 ### *Disclaimer*
-Pour les images, convertissez-les en .jpg.
+- Pour les images, convertissez-les en .jpg.
 Cela ne marche pas pour les .png.
+- En fonction de la taille de votre vidéo et de votre éditeur de code, vous aurez peut-être besoin d'augmenter la taille de la *Heap*.
+Une recherche d'optimisation est en cours pour ce problème.
+Cela est nécessaire si vous obtenez l'erreur suivante (ou toute autre erreur concernant un manque d'espace) :
+````
+MemoryError: Unable to allocate <space> for an array with shape (<x>, <y>, <z>) and data type float64
+````
