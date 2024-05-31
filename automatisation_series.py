@@ -56,14 +56,14 @@ def automate_series(path_series: str, name_render: str, method: str = "emd"):
 				img_recolored = poti.apply_ot()
 				axs[i, j].imshow(img_recolored)
 
-				matplotlib.image.imsave(os.path.join(path_render, f"from{i + 1}_to{j + 1}_method-{method}.png"), img_recolored)
+				matplotlib.image.imsave(os.path.join(path_render, f"from{i + 1}_to{j + 1}_method-{method}.png"),
+										img_recolored)
 			else:
 				axs[i, j].imshow(info[0])
 			axs[i, j].set(xlabel=f'{j + 1}', ylabel=f'{i + 1}')
 			axs[i, j].label_outer()
 			axs[i, j].spines[['top', 'right', 'left', 'bottom']].set_visible(False)
-			axs[i, j].tick_params(left=False, right=False, labelleft=False,
-								  labelbottom=False, bottom=False)
+			axs[i, j].tick_params(left=False, right=False, labelleft=False, labelbottom=False, bottom=False)
 			j += 1
 		i += 1
 	fig.suptitle("Série 'Cathédrale de Rouen' par Monet - " + method)
@@ -79,11 +79,3 @@ def automate_series(path_series: str, name_render: str, method: str = "emd"):
 		f.write("Les couleurs d'une image i sont appliquées à l'ensemble des images (sauf elle même, l'image à la "
 				"position (i, i)) sur la ligne i.\n")
 		f.write(f"Temps d'exécution et de render = {nb_sec} secondes, soit {nb_min} minutes.")
-
-
-if __name__ == '__main__':
-	automate_series("./photos/cathedrale_rouen_monet", "serie_cathedrale_monet", method="emd")
-	automate_series("./photos/cathedrale_rouen_monet", "serie_cathedrale_monet", method="sinkhorn")
-	automate_series("./photos/cathedrale_rouen_monet", "serie_cathedrale_monet", method="linear")
-	automate_series("./photos/cathedrale_rouen_monet", "serie_cathedrale_monet", method="gaussian")
-
