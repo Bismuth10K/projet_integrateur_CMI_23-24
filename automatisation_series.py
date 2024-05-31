@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from POTI import POTI
 
 
-def automate_series(path_series: str, name_render: str):
+def automate_series(path_series: str, name_render: str, method: str = "emd"):
 	"""
 	Cette fonction automatise le render d'une série d'images.
 	Elle crée toutes les images recolorisées et les enregistre séparément et en groupe sur un plot spécifique.
@@ -39,7 +39,7 @@ def automate_series(path_series: str, name_render: str):
 		else:
 			list_name.remove(list_name[file])
 
-	path_render = os.path.join(path_series + "/individual_render/")
+	path_render = os.path.join(path_series + f"/individual_render_{method}/")
 	if not os.path.exists(path_render):
 		os.makedirs(path_render)
 	plt.rcParams['figure.dpi'] = 300
@@ -52,11 +52,11 @@ def automate_series(path_series: str, name_render: str):
 			print(f"- Image référence {i + 1} ({list_name[i]}) sur image cible {j + 1} ({list_name[j]})")
 			if i != j:
 				poti.set_target_all(info[0], info[1], info[2], info[3])
-				poti.train_ot()
+				poti.train_ot(method)
 				img_recolored = poti.apply_ot()
 				axs[i, j].imshow(img_recolored)
 
-				matplotlib.image.imsave(os.path.join(path_render, f"from{i + 1}_to{j + 1}.png"), img_recolored)
+				matplotlib.image.imsave(os.path.join(path_render, f"from{i + 1}_to{j + 1}_method-{method}.png"), img_recolored)
 			else:
 				axs[i, j].imshow(info[0])
 			axs[i, j].set(xlabel=f'{j + 1}', ylabel=f'{i + 1}')
@@ -66,14 +66,14 @@ def automate_series(path_series: str, name_render: str):
 								  labelbottom=False, bottom=False)
 			j += 1
 		i += 1
-	fig.suptitle("Série 'Cathédrale de Rouen' par Monet")
+	fig.suptitle("Série 'Cathédrale de Rouen' par Monet - " + method)
 	plt.savefig(os.path.join(path_render, f"{name_render}.png"), bbox_inches='tight')
 
 	nb_sec = round(time.time() - start, 2)
 	nb_min = round(nb_sec / 60, 2)
 	print(f"Durée totale : {nb_sec}s - {nb_min}min")
 
-	with open(os.path.join(path_render, f"legende_{name_render}.txt"), 'w') as f:
+	with open(os.path.join(path_render, f"legende_{name_render}_{method}.txt"), 'w') as f:
 		f.write(titre + "\n")
 		f.write("Une ligne contient toutes les images.\n")
 		f.write("Les couleurs d'une image i sont appliquées à l'ensemble des images (sauf elle même, l'image à la "
@@ -82,4 +82,8 @@ def automate_series(path_series: str, name_render: str):
 
 
 if __name__ == '__main__':
-	automate_series("./photos/cathedrale_rouen_monet", "serie_cathedrale_monet")
+	automate_series("./photos/cathedrale_rouen_monet", "serie_cathedrale_monet", method="emd")
+	automate_series("./photos/cathedrale_rouen_monet", "serie_cathedrale_monet", method="sinkhorn")
+	automate_series("./photos/cathedrale_rouen_monet", "serie_cathedrale_monet", method="linear")
+	automate_series("./photos/cathedrale_rouen_monet", "serie_cathedrale_monet", method="gaussian")
+
