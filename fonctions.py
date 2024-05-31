@@ -3,6 +3,8 @@ import numpy as np
 import ot
 from matplotlib import pyplot as plt
 from sklearn.cluster import MiniBatchKMeans
+from video_son import video_son
+
 
 rng = np.random.RandomState(1)
 
