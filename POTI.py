@@ -149,7 +149,7 @@ class POTI:
 			ot_model.fit(Xs=self.mat_cluster_tar, Xt=self.mat_cluster_ref)
 			self.ot_model = ot_model
 
-			print(f"Temps d'entraînement : {round(time.time() - start, 2)}s")
+			# print(f"Temps d'entraînement : {round(time.time() - start, 2)}s")
 		except Exception:
 			raise Exception("Pas de cible.")
 
@@ -165,5 +165,5 @@ class POTI:
 		new_img = self.ot_model.transform(Xs=self.mat_cluster_tar)
 		img = minmax(mat2im(new_img, self.mat_cluster_tar.shape))
 		img_col = mat2im(img[self.model_cluster.predict(self.mat_tar), :], self.img_tar.shape)
-		print(f"Temps de colorisation : {round(time.time() - start, 2)}s")
+		# print(f"Temps de colorisation : {round(time.time() - start, 2)}s")
 		return img_col

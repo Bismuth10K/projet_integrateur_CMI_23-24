@@ -1,6 +1,6 @@
 import os
 import time
-
+from tqdm import tqdm
 import matplotlib.image
 import matplotlib.pyplot as plt
 
@@ -46,10 +46,10 @@ def automate_series(path_series: str, name_render: str, method: str = "emd"):
 	plt.rcParams['savefig.dpi'] = 300
 	fig, axs = plt.subplots(len(list_obj_poti), len(list_obj_poti), figsize=(10, 8))
 	i = 0
-	for poti in list_obj_poti:
+	for poti in tqdm(list_obj_poti, desc="Recolorisation des images"):
 		j = 0
 		for info in list_info_imgs:
-			print(f"- Image référence {i + 1} ({list_name[i]}) sur image cible {j + 1} ({list_name[j]})")
+			# print(f"- Image référence {i + 1} ({list_name[i]}) sur image cible {j + 1} ({list_name[j]})")
 			if i != j:
 				poti.set_target_all(info[0], info[1], info[2], info[3])
 				poti.train_ot(method)

@@ -141,9 +141,8 @@ class POTV(POTI):
 			ot_model = [self.ot_model]
 		videos = [cv2.VideoWriter(title_video[i] + ".mkv", fourcc, 30, (width, height)) for i in range(len(ot_model))]
 
-		for count in range(len(self.frames_tar)):
-			print(
-				f"Recolorisation frame {count + 1}/{len(self.frames_tar)} - {round((count + 1) / len(self.frames_tar) * 100, 2)}%")
+		for count in tqdm(range(len(self.frames_tar)), desc="Recolorisation frames"):
+			# print(f"Recolorisation frame {count + 1}/{len(self.frames_tar)} - {round((count + 1) / len(self.frames_tar) * 100, 2)}%")
 			mat_img = im2mat(self.frames_tar[count])
 			X = clustering(mat_img, self.model_cluster)
 
@@ -164,12 +163,6 @@ class POTV(POTI):
 		# Ajout de l'audio de la vidéo de référence à la vidéo cible recolorisée
 		audio_recupe = './videos/audio.wav'  # Chemin pour sauvegarder l'audio extrait
 		for title in title_video:
-			final_video_with_audio = "./videos/" + title + ".mkv"  # Chemin de la vidéo finale avec l'audio ajouté
-			video_with_audio = VideoSon(self.path_vid_tar, audio_recupe, title + ".mkv", final_video_with_audio)
+			final_video_with_audio = title + ".mkv"  # Chemin de la vidéo finale avec l'audio ajouté
+			video_with_audio = VideoSon(self.path_vid_tar, audio_recupe, final_video_with_audio, final_video_with_audio)
 			video_with_audio.ajout_son_video()
-		
-		# Ajout de la barre de progression
-		for i in tqdm (range(10), desc="Work in progress", unit="%", unit_scale=True, leave=True):
-			time.sleep(1)
-
-
