@@ -1,8 +1,10 @@
+from tqdm import tqdm #import de la barre de progression
 import time
 
 from POTI import POTI
 from fonctions import *
 from videoson import VideoSon
+
 
 
 class POTV(POTI):
@@ -165,3 +167,9 @@ class POTV(POTI):
 			final_video_with_audio = "./videos/" + title + ".mkv"  # Chemin de la vidéo finale avec l'audio ajouté
 			video_with_audio = VideoSon(self.path_vid_tar, audio_recupe, title + ".mkv", final_video_with_audio)
 			video_with_audio.ajout_son_video()
+		
+		# Ajout de la barre de progression
+		for i in tqdm (range(10), desc="Work in progress", unit="%", unit_scale=True, leave=True):
+			time.sleep(1)
+
+
