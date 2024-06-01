@@ -1,5 +1,5 @@
 import time
-
+from tqdm import tqdm
 import matplotlib
 
 from POTI import POTI
@@ -7,7 +7,7 @@ from POTV import POTV
 from automatisation_series import automate_series
 
 
-def runner(path_imgs_ref: list, path_vid_tar: str, list_method: str = ["emd", "sinkhorn", "linear", "gaussian"]):
+def runner(path_imgs_ref: list[str], path_vid_tar: str, list_method: list[str] = ("emd", "sinkhorn", "linear", "gaussian")):
 	"""
 	La fonction qui automatise le traitement de plusieurs vidéos d'un coup.
 
@@ -52,9 +52,10 @@ if __name__ == '__main__':
 			vid_tar = './ciotat/Arrivee train à La Ciotat.mp4'
 			runner(img_ref, vid_tar)
 		case 1:
-			img_ref = ['./photos/picture_city.jpg']
-			vid_tar = './videos/video_city.mp4'
-			runner(img_ref, vid_tar, ["sinkhorn"])
+			img_ref = ['./photos/picture_city.jpg',
+					   './photos/cathedrale_rouen_monet/Cathédrale de Rouen, façade ouest.jpg']
+			vid_tar = './videos/ultra_short_city.mp4'
+			runner(img_ref, vid_tar, ["sinkhorn", "emd"])
 		case 2:
 			img_ref = './photos/control_game_red_room.jpg'
 			img_tar = './photos/picture_city.jpg'
